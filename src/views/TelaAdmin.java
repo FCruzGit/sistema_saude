@@ -1,5 +1,3 @@
-//src/views/TelaAdmin.java
-
 package views;
 
 import core.SistemaFarmacia;
@@ -12,6 +10,8 @@ import javax.imageio.ImageIO;
 import javax.swing.*;
 import java.awt.*;
 import java.io.File;
+import java.util.HashMap;
+import java.util.Map;
 
 public class TelaAdmin extends JFrame {
     private static final Color COR_AZUL_SUS = new Color(0, 94, 184);
@@ -143,10 +143,11 @@ public class TelaAdmin extends JFrame {
         painelOpcoes.add(criarCardOpcao("1", "Gerenciar UBS", "Adicionar, editar ou remover unidades", () -> gerenciarUBS()));
         painelOpcoes.add(criarCardOpcao("2", "Gerenciar Remédios", "Cadastrar, atualizar ou deletar remédios", () -> gerenciarRemedios()));
         painelOpcoes.add(criarCardOpcao("3", "Listar Estoque", "Visualizar informações de estoque", () -> listarEstoque()));
-        painelOpcoes.add(criarCardOpcao("4", "Adicionar Fundos", "Adicionar saldo aos usuários", () -> adicionarFundos()));
+        painelOpcoes.add(criarCardOpcao("4", "Adicionar Cotas", "Adicionar cotas mensais aos usuários", () -> adicionarCotas()));
         painelOpcoes.add(criarCardOpcao("5", "Revisar Pedidos", "Aprovar pedidos que precisam de receita", () -> revisarPedidos()));
-        painelOpcoes.add(criarCardOpcao("6", "Consultar Pedidos", "Visualizar todos os pedidos realizados", () -> consultarPedidos()));
-        painelOpcoes.add(criarCardOpcao("7", "Usuários Bloqueados", "Desbloquear usuários com tentativas excedidas", () -> gerenciarBloqueados()));
+        painelOpcoes.add(criarCardOpcao("6", "Concluir Pedidos", "Confirmar retirada de medicamentos", () -> concluirPedidos()));
+        painelOpcoes.add(criarCardOpcao("7", "Consultar Pedidos", "Visualizar todos os pedidos realizados", () -> consultarPedidos()));
+        painelOpcoes.add(criarCardOpcao("8", "Usuários Bloqueados", "Desbloquear usuários com tentativas excedidas", () -> gerenciarBloqueados()));
 
         painelOpcoesWrapper.add(painelOpcoes, BorderLayout.CENTER);
 
@@ -790,34 +791,50 @@ public class TelaAdmin extends JFrame {
             infoPanel.setLayout(new BoxLayout(infoPanel, BoxLayout.Y_AXIS));
             infoPanel.setBackground(COR_BRANCO);
 
+            JPanel headerPanel = new JPanel(new FlowLayout(FlowLayout.LEFT, 10, 0));
+            headerPanel.setBackground(COR_BRANCO);
+            headerPanel.setAlignmentX(Component.LEFT_ALIGNMENT);
+
             JLabel lblPedido = new JLabel("Pedido #" + p.getId());
             lblPedido.setFont(new Font("Arial", Font.BOLD, 20));
             lblPedido.setForeground(COR_AZUL_SUS);
 
-            JLabel lblUsuario = new JLabel("Usuário: " + p.getUsuario().getNome() + " (" + p.getUsuario().getCpf() + ")");
-            lblUsuario.setFont(new Font("Arial", Font.PLAIN, 14));
-            lblUsuario.setForeground(Color.GRAY);
-
-            double total = 0;
-            for (Remedio r : p.getRemedios()) {
-                total += r.getPreco();
+            Color corStatus;
+            if (p.getStatus().equalsIgnoreCase("Concluído")) {
+                corStatus = COR_AZUL_SUS;
+            } else if (p.getStatus().equalsIgnoreCase("Aprovado")) {
+                corStatus = new Color(0, 150, 0);
+            } else if (p.getStatus().equalsIgnoreCase("Pendente")) {
+                corStatus = new Color(255, 140, 0);
+            } else if (p.getStatus().equalsIgnoreCase("Cancelado")) {
+                corStatus = Color.RED;
+            } else {
+                corStatus = Color.GRAY;
             }
 
-            JLabel lblRemedios = new JLabel(String.format("Remédios: %d itens | Subtotal: R$ %.2f", p.getRemedios().size(), total));
+            JLabel lblStatusHeader = new JLabel("● " + p.getStatus());
+            lblStatusHeader.setFont(new Font("Arial", Font.BOLD, 16));
+            lblStatusHeader.setForeground(corStatus);
+
+            headerPanel.add(lblPedido);
+            headerPanel.add(lblStatusHeader);
+
+            infoPanel.add(headerPanel);
+            infoPanel.add(Box.createRigidArea(new Dimension(0, 5)));
+
+            JLabel lblUsuario = new JLabel("Usuario: " + p.getUsuario().getNome() + " (" + p.getUsuario().getCpf() + ")");
+            lblUsuario.setFont(new Font("Arial", Font.PLAIN, 14));
+            lblUsuario.setForeground(Color.GRAY);
+            lblUsuario.setAlignmentX(Component.LEFT_ALIGNMENT);
+
+            JLabel lblRemedios = new JLabel(String.format("Medicamentos: %d itens", p.getRemedios().size()));
             lblRemedios.setFont(new Font("Arial", Font.PLAIN, 14));
             lblRemedios.setForeground(Color.DARK_GRAY);
+            lblRemedios.setAlignmentX(Component.LEFT_ALIGNMENT);
 
-            JLabel lblTotal = new JLabel(String.format("Total: R$ %.2f | Status: %s", total, p.getStatus()));
-            lblTotal.setFont(new Font("Arial", Font.BOLD, 16));
-            lblTotal.setForeground(new Color(0, 150, 0));
-
-            infoPanel.add(lblPedido);
-            infoPanel.add(Box.createRigidArea(new Dimension(0, 5)));
             infoPanel.add(lblUsuario);
             infoPanel.add(Box.createRigidArea(new Dimension(0, 5)));
             infoPanel.add(lblRemedios);
-            infoPanel.add(Box.createRigidArea(new Dimension(0, 5)));
-            infoPanel.add(lblTotal);
 
             cardPedido.add(infoPanel, BorderLayout.CENTER);
 
@@ -869,8 +886,8 @@ public class TelaAdmin extends JFrame {
         return btn;
     }
 
-    private void adicionarFundos() {
-        JDialog dialog = new JDialog(this, "Adicionar Fundos", true);
+    private void adicionarCotas() {
+        JDialog dialog = new JDialog(this, "Adicionar Cotas", true);
         dialog.setSize(900, 600);
         dialog.setLocationRelativeTo(this);
         dialog.getContentPane().setBackground(COR_FUNDO);
@@ -879,7 +896,7 @@ public class TelaAdmin extends JFrame {
         mainPanel.setBackground(COR_FUNDO);
         mainPanel.setBorder(BorderFactory.createEmptyBorder(20, 20, 20, 20));
 
-        JLabel titulo = new JLabel("Gerenciar Fundos dos Usuários", SwingConstants.CENTER);
+        JLabel titulo = new JLabel("Gerenciar Cotas dos Usuários", SwingConstants.CENTER);
         titulo.setFont(new Font("Arial", Font.BOLD, 24));
         titulo.setForeground(COR_AZUL_SUS);
         mainPanel.add(titulo, BorderLayout.NORTH);
@@ -887,8 +904,8 @@ public class TelaAdmin extends JFrame {
         DefaultListModel<String> model = new DefaultListModel<>();
         for (Usuario u : sistema.getUsuarios()) {
             if (!u.isAdmin()) {
-                model.addElement(String.format("CPF: %s | %s | Saldo: R$ %.2f", 
-                    u.getCpf(), u.getNome(), u.getSaldo()));
+                model.addElement(String.format("CPF: %s | %s | Cotas: %d/%d", 
+                    u.getCpf(), u.getNome(), u.getCotasDisponiveis(), u.getCotaMensal()));
             }
         }
 
@@ -899,22 +916,22 @@ public class TelaAdmin extends JFrame {
         JPanel botoesPanel = new JPanel(new FlowLayout(FlowLayout.CENTER, 15, 10));
         botoesPanel.setBackground(COR_FUNDO);
 
-        JButton btnAdicionar = criarBotaoAcao("Adicionar Fundos");
+        JButton btnAdicionar = criarBotaoAcao("Adicionar Cotas");
         btnAdicionar.addActionListener(e -> {
             String sel = lista.getSelectedValue();
             if (sel != null) {
                 String cpf = sel.split("CPF: ")[1].split(" ")[0];
-                String valorStr = JOptionPane.showInputDialog(dialog, "Digite o valor a adicionar:", "Adicionar Fundos", JOptionPane.QUESTION_MESSAGE);
+                String valorStr = JOptionPane.showInputDialog(dialog, "Digite a quantidade de cotas a adicionar:", "Adicionar Cotas", JOptionPane.QUESTION_MESSAGE);
                 if (valorStr != null && !valorStr.isEmpty()) {
                     try {
-                        double valor = Double.parseDouble(valorStr);
-                        if (valor > 0) {
-                            sistema.adicionarFundos(cpf, valor);
-                            JOptionPane.showMessageDialog(dialog, "Fundos adicionados com sucesso!");
+                        int quantidade = Integer.parseInt(valorStr);
+                        if (quantidade > 0) {
+                            sistema.adicionarCotas(cpf, quantidade);
+                            JOptionPane.showMessageDialog(dialog, "Cotas adicionadas com sucesso!");
                             dialog.dispose();
-                            adicionarFundos();
+                            adicionarCotas();
                         } else {
-                            JOptionPane.showMessageDialog(dialog, "Valor deve ser positivo!", "Erro", JOptionPane.ERROR_MESSAGE);
+                            JOptionPane.showMessageDialog(dialog, "Quantidade deve ser positiva!", "Erro", JOptionPane.ERROR_MESSAGE);
                         }
                     } catch (NumberFormatException ex) {
                         JOptionPane.showMessageDialog(dialog, "Valor inválido!", "Erro", JOptionPane.ERROR_MESSAGE);
@@ -976,18 +993,14 @@ public class TelaAdmin extends JFrame {
                 lblUsuario.setForeground(Color.GRAY);
 
                 StringBuilder remediosStr = new StringBuilder("Remédios: ");
-                double total = 0;
-                for (Remedio r : p.getRemedios()) {
-                    total += r.getPreco();
-                }
 
-                JLabel lblRemedios = new JLabel(String.format("Remédios: %d itens | Subtotal: R$ %.2f", p.getRemedios().size(), total));
+                JLabel lblRemedios = new JLabel(String.format("Medicamentos: %d itens", p.getRemedios().size()));
                 lblRemedios.setFont(new Font("Arial", Font.PLAIN, 14));
                 lblRemedios.setForeground(Color.DARK_GRAY);
 
-                JLabel lblTotal = new JLabel(String.format("Total: R$ %.2f", total));
-                lblTotal.setFont(new Font("Arial", Font.BOLD, 16));
-                lblTotal.setForeground(new Color(0, 150, 0));
+                JLabel lblInfo = new JLabel("Aguardando aprovação");
+                lblInfo.setFont(new Font("Arial", Font.BOLD, 16));
+                lblInfo.setForeground(new Color(255, 140, 0));
 
                 infoPanel.add(lblPedido);
                 infoPanel.add(Box.createRigidArea(new Dimension(0, 5)));
@@ -995,7 +1008,7 @@ public class TelaAdmin extends JFrame {
                 infoPanel.add(Box.createRigidArea(new Dimension(0, 5)));
                 infoPanel.add(lblRemedios);
                 infoPanel.add(Box.createRigidArea(new Dimension(0, 5)));
-                infoPanel.add(lblTotal);
+                infoPanel.add(lblInfo);
 
                 JPanel botoesPanel = new JPanel(new FlowLayout(FlowLayout.RIGHT, 10, 0));
                 botoesPanel.setBackground(COR_BRANCO);
@@ -1037,6 +1050,133 @@ public class TelaAdmin extends JFrame {
                     revisarPedidos();
                 });
                 botoesPanel.add(btnAprovar);
+
+                cardPedido.add(infoPanel, BorderLayout.CENTER);
+                cardPedido.add(botoesPanel, BorderLayout.EAST);
+
+                painelPedidos.add(cardPedido);
+                painelPedidos.add(Box.createRigidArea(new Dimension(0, 15)));
+            }
+        }
+
+        JScrollPane scroll = new JScrollPane(painelPedidos);
+        scroll.setBorder(BorderFactory.createEmptyBorder());
+        scroll.getVerticalScrollBar().setUnitIncrement(16);
+
+        mainPanel.add(scroll, BorderLayout.CENTER);
+
+        dialog.add(mainPanel);
+        dialog.setVisible(true);
+    }
+
+    private void concluirPedidos() {
+        JDialog dialog = new JDialog(this, "Concluir Pedidos", true);
+        dialog.setSize(1000, 600);
+        dialog.setLocationRelativeTo(this);
+        dialog.getContentPane().setBackground(COR_FUNDO);
+
+        JPanel mainPanel = new JPanel(new BorderLayout(20, 20));
+        mainPanel.setBackground(COR_FUNDO);
+        mainPanel.setBorder(BorderFactory.createEmptyBorder(20, 20, 20, 20));
+
+        JLabel titulo = new JLabel("Pedidos Aprovados - Confirmar Retirada", SwingConstants.CENTER);
+        titulo.setFont(new Font("Arial", Font.BOLD, 24));
+        titulo.setForeground(COR_AZUL_SUS);
+        mainPanel.add(titulo, BorderLayout.NORTH);
+
+        JPanel painelPedidos = new JPanel();
+        painelPedidos.setLayout(new BoxLayout(painelPedidos, BoxLayout.Y_AXIS));
+        painelPedidos.setBackground(COR_FUNDO);
+
+        for (Pedido p : sistema.getPedidos()) {
+            if (p.getStatus().equals("Aprovado")) {
+                JPanel cardPedido = new JPanel(new BorderLayout(15, 0));
+                cardPedido.setBackground(COR_BRANCO);
+                cardPedido.setBorder(BorderFactory.createCompoundBorder(
+                    BorderFactory.createLineBorder(COR_AZUL_SUS, 2, true),
+                    BorderFactory.createEmptyBorder(20, 25, 20, 25)
+                ));
+                cardPedido.setMaximumSize(new Dimension(Integer.MAX_VALUE, 120));
+
+                JPanel infoPanel = new JPanel();
+                infoPanel.setLayout(new BoxLayout(infoPanel, BoxLayout.Y_AXIS));
+                infoPanel.setBackground(COR_BRANCO);
+
+                JLabel lblPedido = new JLabel("Pedido #" + p.getId());
+                lblPedido.setFont(new Font("Arial", Font.BOLD, 20));
+                lblPedido.setForeground(COR_AZUL_SUS);
+
+                JLabel lblUsuario = new JLabel("Usuário: " + p.getUsuario().getNome() + " (" + p.getUsuario().getCpf() + ")");
+                lblUsuario.setFont(new Font("Arial", Font.PLAIN, 14));
+                lblUsuario.setForeground(Color.GRAY);
+
+                JLabel lblRemedios = new JLabel(String.format("Medicamentos: %d itens", p.getRemedios().size()));
+                lblRemedios.setFont(new Font("Arial", Font.PLAIN, 14));
+                lblRemedios.setForeground(Color.DARK_GRAY);
+
+                JLabel lblInfo = new JLabel("Aguardando retirada");
+                lblInfo.setFont(new Font("Arial", Font.BOLD, 16));
+                lblInfo.setForeground(new Color(0, 150, 0));
+
+                infoPanel.add(lblPedido);
+                infoPanel.add(Box.createRigidArea(new Dimension(0, 5)));
+                infoPanel.add(lblUsuario);
+                infoPanel.add(Box.createRigidArea(new Dimension(0, 5)));
+                infoPanel.add(lblRemedios);
+                infoPanel.add(Box.createRigidArea(new Dimension(0, 5)));
+                infoPanel.add(lblInfo);
+
+                JPanel botoesPanel = new JPanel(new FlowLayout(FlowLayout.RIGHT, 10, 0));
+                botoesPanel.setBackground(COR_BRANCO);
+
+                JButton btnCancelar = new JButton("Cancelar");
+                btnCancelar.setFont(new Font("Arial", Font.BOLD, 16));
+                btnCancelar.setForeground(Color.WHITE);
+                btnCancelar.setBackground(new Color(220, 53, 69));
+                btnCancelar.setBorder(BorderFactory.createEmptyBorder(10, 30, 10, 30));
+                btnCancelar.setFocusPainted(false);
+                btnCancelar.setCursor(new Cursor(Cursor.HAND_CURSOR));
+                btnCancelar.addActionListener(e -> {
+                    int confirm = JOptionPane.showConfirmDialog(dialog, 
+                        "Tem certeza que deseja cancelar o pedido #" + p.getId() + "?\nO estoque e as cotas serão devolvidos.", 
+                        "Confirmar Cancelamento", 
+                        JOptionPane.YES_NO_OPTION);
+                    if (confirm == JOptionPane.YES_OPTION) {
+                        // Devolver estoque
+                        Map<Integer, Integer> quantidades = new HashMap<>();
+                        for (Remedio r : p.getRemedios()) {
+                            quantidades.put(r.getId(), quantidades.getOrDefault(r.getId(), 0) + 1);
+                        }
+                        for (Map.Entry<Integer, Integer> entry : quantidades.entrySet()) {
+                            sistema.devolverEstoque(entry.getKey(), entry.getValue());
+                        }
+                        
+                        // Devolver cotas (decrementar cotaUtilizada)
+                        int totalCotas = p.getRemedios().size();
+                        sistema.devolverCota(p.getUsuario().getCpf(), totalCotas);
+                        
+                        sistema.cancelarPedido(p.getId());
+                        JOptionPane.showMessageDialog(dialog, "Pedido #" + p.getId() + " cancelado! Estoque e cotas devolvidos.");
+                        dialog.dispose();
+                        concluirPedidos();
+                    }
+                });
+                botoesPanel.add(btnCancelar);
+
+                JButton btnConcluir = new JButton("Confirmar Retirada");
+                btnConcluir.setFont(new Font("Arial", Font.BOLD, 16));
+                btnConcluir.setForeground(Color.WHITE);
+                btnConcluir.setBackground(new Color(0, 150, 0));
+                btnConcluir.setBorder(BorderFactory.createEmptyBorder(10, 30, 10, 30));
+                btnConcluir.setFocusPainted(false);
+                btnConcluir.setCursor(new Cursor(Cursor.HAND_CURSOR));
+                btnConcluir.addActionListener(e -> {
+                    sistema.concluirPedido(p.getId());
+                    JOptionPane.showMessageDialog(dialog, "Pedido #" + p.getId() + " concluído com sucesso!");
+                    dialog.dispose();
+                    concluirPedidos();
+                });
+                botoesPanel.add(btnConcluir);
 
                 cardPedido.add(infoPanel, BorderLayout.CENTER);
                 cardPedido.add(botoesPanel, BorderLayout.EAST);

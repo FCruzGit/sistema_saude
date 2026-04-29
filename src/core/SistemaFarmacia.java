@@ -70,13 +70,18 @@ public class SistemaFarmacia {
         return usuarioService.buscarPorCpf(cpf);
     }
 
-    public void adicionarFundos(String cpf, double valor) {
-        usuarioService.adicionarFundos(cpf, valor);
+    public void adicionarCotas(String cpf, int quantidade) {
+        usuarioService.adicionarCotas(cpf, quantidade);
         salvar();
     }
 
-    public void diminuirSaldo(String cpf, double valor) {
-        usuarioService.diminuirSaldo(cpf, valor);
+    public void consumirCota(String cpf, int quantidade) {
+        usuarioService.consumirCota(cpf, quantidade);
+        salvar();
+    }
+
+    public void devolverCota(String cpf, int quantidade) {
+        usuarioService.devolverCota(cpf, quantidade);
         salvar();
     }
 
@@ -164,6 +169,16 @@ public class SistemaFarmacia {
 
     public void cancelarPedido(int id) {
         pedidoService.cancelarPedido(id);
+        salvar();
+    }
+
+    public void concluirPedido(int id) {
+        pedidoService.concluirPedido(id);
+        salvar();
+    }
+
+    public void devolverEstoque(int remedioId, int quantidade) {
+        remedioService.aumentarEstoque(remedioId, quantidade);
         salvar();
     }
 
