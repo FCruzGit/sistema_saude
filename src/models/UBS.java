@@ -1,3 +1,7 @@
+//src/models/UBS.java
+
+package models;
+
 public class UBS {
     private int id;
     private String nome;

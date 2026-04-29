@@ -1,7 +1,17 @@
+//src/views/TelaAdmin.java
+
+package views;
+
+import core.SistemaFarmacia;
+import models.Pedido;
+import models.Remedio;
+import models.UBS;
+import models.Usuario;
+
+import javax.imageio.ImageIO;
 import javax.swing.*;
 import java.awt.*;
 import java.io.File;
-import javax.imageio.ImageIO;
 
 public class TelaAdmin extends JFrame {
     private static final Color COR_AZUL_SUS = new Color(0, 94, 184);

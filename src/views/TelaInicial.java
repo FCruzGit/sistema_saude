@@ -1,7 +1,14 @@
+//src/views/TelaInicial.java
+
+package views;
+
+import core.SistemaFarmacia;
+import models.Usuario;
+
+import javax.imageio.ImageIO;
 import javax.swing.*;
 import java.awt.*;
 import java.io.File;
-import javax.imageio.ImageIO;
 
 public class TelaInicial extends JFrame {
     private static final Color COR_AZUL_SUS = new Color(0, 94, 184);
@@ -30,7 +37,8 @@ public class TelaInicial extends JFrame {
             add(mainPanel);
             setVisible(true);
             System.out.println("TelaInicial carregada com sucesso");
-        } catch (Exception e) {
+        }
+        catch (Exception e) {
             System.err.println("Erro ao criar TelaInicial:");
             e.printStackTrace();
         }
@@ -86,6 +94,9 @@ public class TelaInicial extends JFrame {
         ));
         txtSenha.setAlignmentX(Component.LEFT_ALIGNMENT);
         txtSenha.addActionListener(e -> realizarLogin(txtCpf, txtSenha));
+        
+        // Adicionar listener de Enter no campo CPF também
+        txtCpf.addActionListener(e -> realizarLogin(txtCpf, txtSenha));
 
         JButton btnEntrar = new JButton("Entrar");
         btnEntrar.setPreferredSize(new Dimension(450, 45));
