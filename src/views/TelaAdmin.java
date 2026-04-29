@@ -71,6 +71,13 @@ public class TelaAdmin extends JFrame {
         } catch (Exception e) {
             System.err.println("Erro ao carregar logo: " + e.getMessage());
         }
+        
+        try {
+            Image icon = ImageIO.read(new File("assets/icon.png"));
+            setIconImage(icon);
+        } catch (Exception e) {
+            System.err.println("Erro ao carregar ícone: " + e.getMessage());
+        }
 
         JPanel rightPanel = new JPanel(new FlowLayout(FlowLayout.RIGHT, 20, 0));
         rightPanel.setBackground(COR_BRANCO);

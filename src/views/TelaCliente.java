@@ -79,6 +79,35 @@ public class TelaCliente extends JFrame {
         } catch (Exception e) {
             System.err.println("Erro ao carregar logo: " + e.getMessage());
         }
+        
+        try {
+            Image icon = ImageIO.read(new File("assets/icon.png"));
+            setIconImage(icon);
+        } catch (Exception e) {
+            System.err.println("Erro ao carregar ícone: " + e.getMessage());
+        }
+        
+        JButton btnMeusPedidos = new JButton();
+        try {
+            File searchFile = new File("assets/search.png");
+            if (searchFile.exists()) {
+                Image img = ImageIO.read(searchFile);
+                Image scaledImg = img.getScaledInstance(20, 20, Image.SCALE_SMOOTH);
+                btnMeusPedidos.setIcon(new ImageIcon(scaledImg));
+            }
+        } catch (Exception e) {
+            System.err.println("Erro ao carregar ícone de busca: " + e.getMessage());
+        }
+        btnMeusPedidos.setText(" Meus Pedidos");
+        btnMeusPedidos.setFont(new Font("Arial", Font.BOLD, 14));
+        btnMeusPedidos.setForeground(Color.WHITE);
+        btnMeusPedidos.setBackground(COR_AZUL_SUS);
+        btnMeusPedidos.setBorder(BorderFactory.createEmptyBorder(8, 20, 8, 20));
+        btnMeusPedidos.setFocusPainted(false);
+        btnMeusPedidos.setCursor(new Cursor(Cursor.HAND_CURSOR));
+        btnMeusPedidos.addActionListener(e -> consultarMeusPedidos());
+        
+        leftPanel.add(btnMeusPedidos);
 
         JPanel rightPanel = new JPanel(new FlowLayout(FlowLayout.RIGHT, 20, 0));
         rightPanel.setBackground(COR_BRANCO);
@@ -926,5 +955,101 @@ public class TelaCliente extends JFrame {
             sistema.enviarReceita(usuarioAtual.getNome(), arquivo);
             JOptionPane.showMessageDialog(this, "Receita enviada!");
         }
+    }
+    
+    private void consultarMeusPedidos() {
+        JDialog dialog = new JDialog(this, "Meus Pedidos", true);
+        dialog.setSize(900, 600);
+        dialog.setLocationRelativeTo(this);
+        dialog.getContentPane().setBackground(COR_FUNDO);
+
+        JPanel mainPanel = new JPanel(new BorderLayout(20, 20));
+        mainPanel.setBackground(COR_FUNDO);
+        mainPanel.setBorder(BorderFactory.createEmptyBorder(20, 20, 20, 20));
+
+        JLabel titulo = new JLabel("Meus Pedidos", SwingConstants.CENTER);
+        titulo.setFont(new Font("Arial", Font.BOLD, 24));
+        titulo.setForeground(COR_AZUL_SUS);
+        mainPanel.add(titulo, BorderLayout.NORTH);
+
+        JPanel painelPedidos = new JPanel();
+        painelPedidos.setLayout(new BoxLayout(painelPedidos, BoxLayout.Y_AXIS));
+        painelPedidos.setBackground(COR_FUNDO);
+
+        java.util.List<Pedido> todosPedidos = sistema.getPedidos();
+        boolean temPedidos = false;
+        
+        for (Pedido p : todosPedidos) {
+            if (p.getUsuario().getCpf().equals(usuarioAtual.getCpf())) {
+                temPedidos = true;
+                JPanel cardPedido = new JPanel(new BorderLayout(15, 0));
+                cardPedido.setBackground(COR_BRANCO);
+                cardPedido.setBorder(BorderFactory.createCompoundBorder(
+                    BorderFactory.createLineBorder(COR_AZUL_SUS, 2, true),
+                    BorderFactory.createEmptyBorder(20, 25, 20, 25)
+                ));
+                cardPedido.setMaximumSize(new Dimension(Integer.MAX_VALUE, 120));
+
+                JPanel infoPanel = new JPanel();
+                infoPanel.setLayout(new BoxLayout(infoPanel, BoxLayout.Y_AXIS));
+                infoPanel.setBackground(COR_BRANCO);
+
+                JLabel lblPedido = new JLabel("Pedido #" + p.getId());
+                lblPedido.setFont(new Font("Arial", Font.BOLD, 20));
+                lblPedido.setForeground(COR_AZUL_SUS);
+
+                double total = 0;
+                for (Remedio r : p.getRemedios()) {
+                    total += r.getPreco();
+                }
+
+                JLabel lblRemedios = new JLabel(String.format("Remédios: %d itens | Total: R$ %.2f", p.getRemedios().size(), total));
+                lblRemedios.setFont(new Font("Arial", Font.PLAIN, 14));
+                lblRemedios.setForeground(Color.DARK_GRAY);
+
+                Color corStatus;
+                if (p.getStatus().equals("Aprovado")) {
+                    corStatus = new Color(0, 150, 0);
+                } else if (p.getStatus().equals("Pendente")) {
+                    corStatus = new Color(255, 140, 0);
+                } else {
+                    corStatus = Color.RED;
+                }
+
+                JLabel lblStatus = new JLabel("Status: " + p.getStatus());
+                lblStatus.setFont(new Font("Arial", Font.BOLD, 16));
+                lblStatus.setForeground(corStatus);
+
+                infoPanel.add(lblPedido);
+                infoPanel.add(Box.createRigidArea(new Dimension(0, 5)));
+                infoPanel.add(lblRemedios);
+                infoPanel.add(Box.createRigidArea(new Dimension(0, 5)));
+                infoPanel.add(lblStatus);
+
+                cardPedido.add(infoPanel, BorderLayout.CENTER);
+
+                painelPedidos.add(cardPedido);
+                painelPedidos.add(Box.createRigidArea(new Dimension(0, 15)));
+            }
+        }
+        
+        if (!temPedidos) {
+            JLabel lblVazio = new JLabel("Você ainda não realizou nenhum pedido.");
+            lblVazio.setFont(new Font("Arial", Font.PLAIN, 16));
+            lblVazio.setForeground(Color.GRAY);
+            lblVazio.setAlignmentX(Component.CENTER_ALIGNMENT);
+            painelPedidos.add(Box.createVerticalGlue());
+            painelPedidos.add(lblVazio);
+            painelPedidos.add(Box.createVerticalGlue());
+        }
+
+        JScrollPane scroll = new JScrollPane(painelPedidos);
+        scroll.setBorder(BorderFactory.createEmptyBorder());
+        scroll.getVerticalScrollBar().setUnitIncrement(16);
+
+        mainPanel.add(scroll, BorderLayout.CENTER);
+
+        dialog.add(mainPanel);
+        dialog.setVisible(true);
     }
 }
