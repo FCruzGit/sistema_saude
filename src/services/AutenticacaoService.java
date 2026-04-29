@@ -20,15 +20,20 @@ public class AutenticacaoService {
         List<Map<String, Object>> usuarios = (List<Map<String, Object>>) dados.get("usuarios");
         for (Map<String, Object> obj : usuarios) {
             if (obj.get("cpf").toString().toLowerCase().equals(cpf.toLowerCase())) {
+                boolean isAdmin = obj.containsKey("isAdmin") ? (Boolean) obj.get("isAdmin") : false;
                 int tentativasErradas = obj.containsKey("tentativasErradas") ? ((Number) obj.get("tentativasErradas")).intValue() : 0;
                 
-                if (tentativasErradas >= 3) return null;
+                // Administrador nunca é bloqueado
+                if (!isAdmin && tentativasErradas >= 3) return null;
                 
                 if (obj.get("senha").equals(senha)) {
                     obj.put("tentativasErradas", 0);
                     return construirUsuario(obj);
                 } else {
-                    obj.put("tentativasErradas", tentativasErradas + 1);
+                    // Só incrementa tentativas se não for admin
+                    if (!isAdmin) {
+                        obj.put("tentativasErradas", tentativasErradas + 1);
+                    }
                     return null;
                 }
             }

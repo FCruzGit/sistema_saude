@@ -24,6 +24,13 @@ public class TelaInicial extends JFrame {
             setDefaultCloseOperation(JFrame.EXIT_ON_CLOSE);
             setLocationRelativeTo(null);
             getContentPane().setBackground(COR_FUNDO);
+            
+            try {
+                Image icon = ImageIO.read(new File("assets/icon.png"));
+                setIconImage(icon);
+            } catch (Exception e) {
+                System.err.println("Erro ao carregar ícone: " + e.getMessage());
+            }
 
             JPanel mainPanel = new JPanel(new GridLayout(1, 2, 0, 0));
             mainPanel.setBackground(COR_FUNDO);

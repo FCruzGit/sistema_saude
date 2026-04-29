@@ -6,7 +6,8 @@
 \lib
 \out
 \.idea
-\dados.json
+dados.json
+\.amazonq
 
 # Compiled class file
 *.class
