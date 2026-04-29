@@ -98,4 +98,16 @@ public class RemedioService {
             }
         }
     }
+
+    @SuppressWarnings("unchecked")
+    public void aumentarEstoque(int remedioId, int quantidade) {
+        List<Map<String, Object>> remedios = (List<Map<String, Object>>) dados.get("remedios");
+        for (Map<String, Object> obj : remedios) {
+            if (((Number) obj.get("id")).intValue() == remedioId) {
+                int estoqueAtual = ((Number) obj.get("estoque")).intValue();
+                obj.put("estoque", estoqueAtual + quantidade);
+                break;
+            }
+        }
+    }
 }

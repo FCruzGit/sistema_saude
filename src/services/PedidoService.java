@@ -24,16 +24,19 @@ public class PedidoService {
         List<Map<String, Object>> arr = (List<Map<String, Object>>) dados.get("pedidos");
         for (Map<String, Object> obj : arr) {
             Map<String, Object> usuarioObj = (Map<String, Object>) obj.get("usuario");
-            double saldo = usuarioObj.containsKey("saldo") ? ((Number) usuarioObj.get("saldo")).doubleValue() : 0.0;
+            int cotaMensal = usuarioObj.containsKey("cotaMensal") ? ((Number) usuarioObj.get("cotaMensal")).intValue() : 10;
+            int cotaUtilizada = usuarioObj.containsKey("cotaUtilizada") ? ((Number) usuarioObj.get("cotaUtilizada")).intValue() : 0;
+            String mesReferencia = usuarioObj.containsKey("mesReferencia") ? (String) usuarioObj.get("mesReferencia") : null;
             String cpf = usuarioObj.containsKey("cpf") ? (String) usuarioObj.get("cpf") : (String) usuarioObj.get("numeroSus");
             String respostaSeguranca = usuarioObj.containsKey("respostaSeguranca") ? (String) usuarioObj.get("respostaSeguranca") : "";
+            int tentativasErradas = usuarioObj.containsKey("tentativasErradas") ? ((Number) usuarioObj.get("tentativasErradas")).intValue() : 0;
             Usuario usuario = new Usuario(
                 cpf,
                 (String) usuarioObj.get("nome"),
                 (String) usuarioObj.get("email"),
                 "",
                 usuarioObj.containsKey("isAdmin") ? (Boolean) usuarioObj.get("isAdmin") : false,
-                saldo, respostaSeguranca
+                cotaMensal, cotaUtilizada, mesReferencia, respostaSeguranca, tentativasErradas
             );
             String status = obj.containsKey("status") ? (String) obj.get("status") : "Pendente";
             String caminhoReceita = obj.containsKey("caminhoReceita") ? (String) obj.get("caminhoReceita") : null;
@@ -127,6 +130,17 @@ public class PedidoService {
         for (Map<String, Object> obj : pedidos) {
             if (((Number) obj.get("id")).intValue() == id) {
                 obj.put("status", "Cancelado");
+                break;
+            }
+        }
+    }
+
+    @SuppressWarnings("unchecked")
+    public void concluirPedido(int id) {
+        List<Map<String, Object>> pedidos = (List<Map<String, Object>>) dados.get("pedidos");
+        for (Map<String, Object> obj : pedidos) {
+            if (((Number) obj.get("id")).intValue() == id) {
+                obj.put("status", "Concluído");
                 break;
             }
         }

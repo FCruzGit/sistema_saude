@@ -63,7 +63,9 @@ public class AutenticacaoService {
         usuario.put("email", email);
         usuario.put("senha", senha);
         usuario.put("isAdmin", false);
-        usuario.put("saldo", 0.0);
+        usuario.put("cotaMensal", 10);
+        usuario.put("cotaUtilizada", 0);
+        usuario.put("mesReferencia", java.time.YearMonth.now().toString());
         usuario.put("respostaSeguranca", respostaSeguranca);
         usuario.put("tentativasErradas", 0);
         usuarios.add(usuario);
@@ -82,7 +84,9 @@ public class AutenticacaoService {
     }
 
     private Usuario construirUsuario(Map<String, Object> obj) {
-        double saldo = obj.containsKey("saldo") ? ((Number) obj.get("saldo")).doubleValue() : 0.0;
+        int cotaMensal = obj.containsKey("cotaMensal") ? ((Number) obj.get("cotaMensal")).intValue() : 10;
+        int cotaUtilizada = obj.containsKey("cotaUtilizada") ? ((Number) obj.get("cotaUtilizada")).intValue() : 0;
+        String mesReferencia = obj.containsKey("mesReferencia") ? (String) obj.get("mesReferencia") : null;
         String respostaSeguranca = obj.containsKey("respostaSeguranca") ? (String) obj.get("respostaSeguranca") : "";
         int tentativasErradas = obj.containsKey("tentativasErradas") ? ((Number) obj.get("tentativasErradas")).intValue() : 0;
         return new Usuario(
@@ -91,7 +95,7 @@ public class AutenticacaoService {
             (String) obj.get("email"),
             (String) obj.get("senha"),
             obj.containsKey("isAdmin") ? (Boolean) obj.get("isAdmin") : false,
-            saldo, respostaSeguranca, tentativasErradas
+            cotaMensal, cotaUtilizada, mesReferencia, respostaSeguranca, tentativasErradas
         );
     }
 }

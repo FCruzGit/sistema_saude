@@ -76,14 +76,16 @@ public class TelaCliente extends JFrame {
                 lblSus.setForeground(COR_AZUL_SUS);
                 leftPanel.add(lblSus);
             }
-        } catch (Exception e) {
+        }
+        catch (Exception e) {
             System.err.println("Erro ao carregar logo: " + e.getMessage());
         }
         
         try {
             Image icon = ImageIO.read(new File("assets/icon.png"));
             setIconImage(icon);
-        } catch (Exception e) {
+        }
+        catch (Exception e) {
             System.err.println("Erro ao carregar ícone: " + e.getMessage());
         }
         
@@ -95,7 +97,8 @@ public class TelaCliente extends JFrame {
                 Image scaledImg = img.getScaledInstance(20, 20, Image.SCALE_SMOOTH);
                 btnMeusPedidos.setIcon(new ImageIcon(scaledImg));
             }
-        } catch (Exception e) {
+        }
+        catch (Exception e) {
             System.err.println("Erro ao carregar ícone de busca: " + e.getMessage());
         }
         btnMeusPedidos.setText(" Meus Pedidos");
@@ -116,7 +119,7 @@ public class TelaCliente extends JFrame {
         lblUsuario.setFont(new Font("Arial", Font.BOLD, 18));
         lblUsuario.setForeground(COR_AZUL_SUS);
 
-        JLabel lblSaldo = new JLabel(String.format("Saldo: R$ %.2f", usuarioAtual != null ? usuarioAtual.getSaldo() : 0.0));
+        JLabel lblSaldo = new JLabel(String.format("Cotas: %d/%d", usuarioAtual != null ? usuarioAtual.getCotasDisponiveis() : 0, usuarioAtual != null ? usuarioAtual.getCotaMensal() : 10));
         lblSaldo.setFont(new Font("Arial", Font.BOLD, 18));
         lblSaldo.setForeground(new Color(0, 150, 0));
 
@@ -502,26 +505,19 @@ public class TelaCliente extends JFrame {
             painelEsquerdoInfo.add(lblReceita);
         }
 
-        JPanel painelDireitoInfo = new JPanel();
-        painelDireitoInfo.setLayout(new BoxLayout(painelDireitoInfo, BoxLayout.Y_AXIS));
-        painelDireitoInfo.setBackground(COR_BRANCO);
-
-        JLabel lblDe = new JLabel(String.format("De: R$ %.2f", r.getPreco() * 3));
-        lblDe.setFont(new Font("Arial", Font.PLAIN, 14));
-        lblDe.setForeground(Color.GRAY);
-        lblDe.setAlignmentX(Component.RIGHT_ALIGNMENT);
-
-        JLabel lblPor = new JLabel(String.format("Por: R$ %.2f", r.getPreco()));
-        lblPor.setFont(new Font("Arial", Font.BOLD, 22));
-        lblPor.setForeground(COR_VERDE);
-        lblPor.setAlignmentX(Component.RIGHT_ALIGNMENT);
-
-        painelDireitoInfo.add(lblDe);
-        painelDireitoInfo.add(Box.createRigidArea(new Dimension(0, 5)));
-        painelDireitoInfo.add(lblPor);
+        JLabel lblEstoque = new JLabel(String.format("Disponível: %d unidade(s)", r.getEstoque()));
+        lblEstoque.setFont(new Font("Arial", Font.PLAIN, 14));
+        lblEstoque.setForeground(Color.DARK_GRAY);
+        lblEstoque.setAlignmentX(Component.LEFT_ALIGNMENT);
+        painelEsquerdoInfo.add(lblEstoque);
+        
+        JLabel lblGratuito = new JLabel("Medicamento gratuito via SUS");
+        lblGratuito.setFont(new Font("Arial", Font.BOLD, 14));
+        lblGratuito.setForeground(COR_VERDE);
+        lblGratuito.setAlignmentX(Component.LEFT_ALIGNMENT);
+        painelEsquerdoInfo.add(lblGratuito);
 
         painelInfo.add(painelEsquerdoInfo, BorderLayout.WEST);
-        painelInfo.add(painelDireitoInfo, BorderLayout.EAST);
 
         painel.add(painelInfo);
         painel.add(Box.createRigidArea(new Dimension(0, 20)));
@@ -711,8 +707,6 @@ public class TelaCliente extends JFrame {
         JPanel painelItens = new JPanel();
         painelItens.setLayout(new BoxLayout(painelItens, BoxLayout.Y_AXIS));
         painelItens.setBackground(COR_FUNDO);
-
-        double[] totalArray = {0};
         
         for (int i = 0; i < carrinho.size(); i++) {
             final int index = i;
@@ -733,10 +727,6 @@ public class TelaCliente extends JFrame {
             JPanel rightPanel = new JPanel(new FlowLayout(FlowLayout.RIGHT, 15, 0));
             rightPanel.setBackground(COR_BRANCO);
 
-            JLabel lblPreco = new JLabel(String.format("R$ %.2f", r.getPreco()));
-            lblPreco.setFont(new Font("Arial", Font.BOLD, 18));
-            lblPreco.setForeground(COR_VERDE);
-
             JButton btnRemover = new JButton("X");
             btnRemover.setFont(new Font("Arial", Font.BOLD, 16));
             btnRemover.setForeground(Color.WHITE);
@@ -750,7 +740,6 @@ public class TelaCliente extends JFrame {
                 verCarrinho();
             });
 
-            rightPanel.add(lblPreco);
             rightPanel.add(btnRemover);
 
             itemCard.add(lblNome, BorderLayout.WEST);
@@ -758,7 +747,6 @@ public class TelaCliente extends JFrame {
 
             painelItens.add(itemCard);
             painelItens.add(Box.createRigidArea(new Dimension(0, 10)));
-            totalArray[0] += r.getPreco();
         }
 
         JScrollPane scroll = new JScrollPane(painelItens);
@@ -777,13 +765,19 @@ public class TelaCliente extends JFrame {
         lblResumo.setFont(new Font("Arial", Font.BOLD, 24));
         lblResumo.setForeground(COR_AZUL_SUS);
 
-        JLabel lblTotal = new JLabel(String.format("Total: R$ %.2f", totalArray[0]));
+        JLabel lblTotal = new JLabel(String.format("Total: %d medicamento(s)", carrinho.size()));
         lblTotal.setFont(new Font("Arial", Font.BOLD, 28));
         lblTotal.setForeground(COR_AZUL_SUS);
+        
+        JLabel lblCota = new JLabel(String.format("Consumirá %d cota(s)", carrinho.size()));
+        lblCota.setFont(new Font("Arial", Font.PLAIN, 16));
+        lblCota.setForeground(Color.GRAY);
 
         resumo.add(lblResumo);
         resumo.add(Box.createRigidArea(new Dimension(0, 20)));
         resumo.add(lblTotal);
+        resumo.add(Box.createRigidArea(new Dimension(0, 10)));
+        resumo.add(lblCota);
 
         JPanel bottomPanel = new JPanel(new BorderLayout(0, 15));
         bottomPanel.setBackground(COR_FUNDO);
@@ -820,17 +814,14 @@ public class TelaCliente extends JFrame {
             return false;
         }
 
-        // Calcular total
-        double total = 0;
-        for (Remedio r : carrinho) {
-            total += r.getPreco();
-        }
+        // Contar quantidade total de medicamentos
+        int quantidadeTotal = carrinho.size();
 
-        // Verificar saldo
-        if (usuarioAtual.getSaldo() < total) {
+        // Verificar cota disponível
+        if (!usuarioAtual.temCotaDisponivel(quantidadeTotal)) {
             JOptionPane.showMessageDialog(this, 
-                String.format("Saldo insuficiente!\nSaldo atual: R$ %.2f\nTotal da compra: R$ %.2f", 
-                    usuarioAtual.getSaldo(), total), 
+                String.format("Cota insuficiente!\nCotas disponíveis: %d\nQuantidade solicitada: %d", 
+                    usuarioAtual.getCotasDisponiveis(), quantidadeTotal), 
                 "Erro", JOptionPane.ERROR_MESSAGE);
             return false;
         }
@@ -845,7 +836,6 @@ public class TelaCliente extends JFrame {
             int remedioId = entry.getKey();
             int qtdSolicitada = entry.getValue();
             
-            // Buscar remédio atualizado do sistema
             Remedio remedioAtual = null;
             for (Remedio r : sistema.getRemedios()) {
                 if (r.getId() == remedioId) {
@@ -892,13 +882,11 @@ public class TelaCliente extends JFrame {
             if (result == JFileChooser.APPROVE_OPTION) {
                 File arquivoSelecionado = fileChooser.getSelectedFile();
                 
-                // Criar diretório se não existir
                 File dirReceitas = new File("assets/user_data/receitas");
                 if (!dirReceitas.exists()) {
                     dirReceitas.mkdirs();
                 }
                 
-                // Copiar arquivo com nome único
                 String extensao = arquivoSelecionado.getName().substring(arquivoSelecionado.getName().lastIndexOf("."));
                 String nomeArquivo = "receita_pedido_" + pedido.getId() + "_" + System.currentTimeMillis() + extensao;
                 File destino = new File(dirReceitas, nomeArquivo);
@@ -921,7 +909,6 @@ public class TelaCliente extends JFrame {
                 return false;
             }
         } else {
-            // Se não precisar de receita, já aprova automaticamente
             sistema.aprovarPedido(pedido.getId());
         }
 
@@ -930,15 +917,15 @@ public class TelaCliente extends JFrame {
             sistema.diminuirEstoque(entry.getKey(), entry.getValue());
         }
 
-        // Diminuir saldo
-        sistema.diminuirSaldo(usuarioAtual.getCpf(), total);
-        usuarioAtual.setSaldo(usuarioAtual.getSaldo() - total);
+        // Consumir cota
+        sistema.consumirCota(usuarioAtual.getCpf(), quantidadeTotal);
+        usuarioAtual.consumirCota(quantidadeTotal);
 
         carrinho.clear();
 
         JOptionPane.showMessageDialog(this, 
-            String.format("Pedido #%d realizado com sucesso!\nValor: R$ %.2f\nSaldo restante: R$ %.2f", 
-                pedido.getId(), total, usuarioAtual.getSaldo()), 
+            String.format("Pedido #%d realizado com sucesso!\nMedicamentos: %d\nCotas restantes: %d", 
+                pedido.getId(), quantidadeTotal, usuarioAtual.getCotasDisponiveis()), 
             "Sucesso", JOptionPane.INFORMATION_MESSAGE);
         atualizarTela();
         return true;
@@ -998,22 +985,21 @@ public class TelaCliente extends JFrame {
                 lblPedido.setFont(new Font("Arial", Font.BOLD, 20));
                 lblPedido.setForeground(COR_AZUL_SUS);
 
-                double total = 0;
-                for (Remedio r : p.getRemedios()) {
-                    total += r.getPreco();
-                }
-
-                JLabel lblRemedios = new JLabel(String.format("Remédios: %d itens | Total: R$ %.2f", p.getRemedios().size(), total));
+                JLabel lblRemedios = new JLabel(String.format("Medicamentos: %d itens", p.getRemedios().size()));
                 lblRemedios.setFont(new Font("Arial", Font.PLAIN, 14));
                 lblRemedios.setForeground(Color.DARK_GRAY);
 
                 Color corStatus;
-                if (p.getStatus().equals("Aprovado")) {
+                if (p.getStatus().equalsIgnoreCase("Concluído")) {
+                    corStatus = COR_AZUL_SUS;
+                } else if (p.getStatus().equalsIgnoreCase("Aprovado")) {
                     corStatus = new Color(0, 150, 0);
-                } else if (p.getStatus().equals("Pendente")) {
+                } else if (p.getStatus().equalsIgnoreCase("Pendente")) {
                     corStatus = new Color(255, 140, 0);
-                } else {
+                } else if (p.getStatus().equalsIgnoreCase("Cancelado")) {
                     corStatus = Color.RED;
+                } else {
+                    corStatus = Color.GRAY;
                 }
 
                 JLabel lblStatus = new JLabel("Status: " + p.getStatus());

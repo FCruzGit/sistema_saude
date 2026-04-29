@@ -20,7 +20,9 @@ public class UsuarioService {
         List<Usuario> usuarios = new ArrayList<>();
         List<Map<String, Object>> arr = (List<Map<String, Object>>) dados.get("usuarios");
         for (Map<String, Object> obj : arr) {
-            double saldo = obj.containsKey("saldo") ? ((Number) obj.get("saldo")).doubleValue() : 0.0;
+            int cotaMensal = obj.containsKey("cotaMensal") ? ((Number) obj.get("cotaMensal")).intValue() : 10;
+            int cotaUtilizada = obj.containsKey("cotaUtilizada") ? ((Number) obj.get("cotaUtilizada")).intValue() : 0;
+            String mesReferencia = obj.containsKey("mesReferencia") ? (String) obj.get("mesReferencia") : null;
             String respostaSeguranca = obj.containsKey("respostaSeguranca") ? (String) obj.get("respostaSeguranca") : "";
             int tentativasErradas = obj.containsKey("tentativasErradas") ? ((Number) obj.get("tentativasErradas")).intValue() : 0;
             usuarios.add(new Usuario(
@@ -29,7 +31,7 @@ public class UsuarioService {
                 (String) obj.get("email"),
                 (String) obj.get("senha"),
                 obj.containsKey("isAdmin") ? (Boolean) obj.get("isAdmin") : false,
-                saldo, respostaSeguranca, tentativasErradas
+                cotaMensal, cotaUtilizada, mesReferencia, respostaSeguranca, tentativasErradas
             ));
         }
         return usuarios;
@@ -40,7 +42,9 @@ public class UsuarioService {
         List<Map<String, Object>> usuarios = (List<Map<String, Object>>) dados.get("usuarios");
         for (Map<String, Object> obj : usuarios) {
             if (obj.get("cpf").toString().toLowerCase().equals(cpf.toLowerCase())) {
-                double saldo = obj.containsKey("saldo") ? ((Number) obj.get("saldo")).doubleValue() : 0.0;
+                int cotaMensal = obj.containsKey("cotaMensal") ? ((Number) obj.get("cotaMensal")).intValue() : 10;
+                int cotaUtilizada = obj.containsKey("cotaUtilizada") ? ((Number) obj.get("cotaUtilizada")).intValue() : 0;
+                String mesReferencia = obj.containsKey("mesReferencia") ? (String) obj.get("mesReferencia") : null;
                 String respostaSeguranca = obj.containsKey("respostaSeguranca") ? (String) obj.get("respostaSeguranca") : "";
                 int tentativasErradas = obj.containsKey("tentativasErradas") ? ((Number) obj.get("tentativasErradas")).intValue() : 0;
                 return new Usuario(
@@ -49,7 +53,7 @@ public class UsuarioService {
                     (String) obj.get("email"),
                     (String) obj.get("senha"),
                     obj.containsKey("isAdmin") ? (Boolean) obj.get("isAdmin") : false,
-                    saldo, respostaSeguranca, tentativasErradas
+                    cotaMensal, cotaUtilizada, mesReferencia, respostaSeguranca, tentativasErradas
                 );
             }
         }
@@ -57,24 +61,37 @@ public class UsuarioService {
     }
 
     @SuppressWarnings("unchecked")
-    public void adicionarFundos(String cpf, double valor) {
+    public void adicionarCotas(String cpf, int quantidade) {
         List<Map<String, Object>> usuarios = (List<Map<String, Object>>) dados.get("usuarios");
         for (Map<String, Object> obj : usuarios) {
             if (obj.get("cpf").equals(cpf)) {
-                double saldoAtual = obj.containsKey("saldo") ? ((Number) obj.get("saldo")).doubleValue() : 0.0;
-                obj.put("saldo", saldoAtual + valor);
+                int cotaMensalAtual = obj.containsKey("cotaMensal") ? ((Number) obj.get("cotaMensal")).intValue() : 10;
+                obj.put("cotaMensal", cotaMensalAtual + quantidade);
                 break;
             }
         }
     }
 
     @SuppressWarnings("unchecked")
-    public void diminuirSaldo(String cpf, double valor) {
+    public void consumirCota(String cpf, int quantidade) {
         List<Map<String, Object>> usuarios = (List<Map<String, Object>>) dados.get("usuarios");
         for (Map<String, Object> obj : usuarios) {
             if (obj.get("cpf").equals(cpf)) {
-                double saldoAtual = obj.containsKey("saldo") ? ((Number) obj.get("saldo")).doubleValue() : 0.0;
-                obj.put("saldo", Math.max(0, saldoAtual - valor));
+                int cotaUtilizadaAtual = obj.containsKey("cotaUtilizada") ? ((Number) obj.get("cotaUtilizada")).intValue() : 0;
+                obj.put("cotaUtilizada", cotaUtilizadaAtual + quantidade);
+                break;
+            }
+        }
+    }
+
+    @SuppressWarnings("unchecked")
+    public void devolverCota(String cpf, int quantidade) {
+        List<Map<String, Object>> usuarios = (List<Map<String, Object>>) dados.get("usuarios");
+        for (Map<String, Object> obj : usuarios) {
+            if (obj.get("cpf").equals(cpf)) {
+                int cotaUtilizadaAtual = obj.containsKey("cotaUtilizada") ? ((Number) obj.get("cotaUtilizada")).intValue() : 0;
+                int novoValor = Math.max(0, cotaUtilizadaAtual - quantidade);
+                obj.put("cotaUtilizada", novoValor);
                 break;
             }
         }
