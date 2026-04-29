@@ -1,6 +1,14 @@
-import java.io.*;
-import java.nio.file.*;
-import java.util.*;
+//src/database/GerenciadorJSON.java
+
+package database;
+
+import java.io.File;
+import java.nio.file.Files;
+import java.nio.file.Paths;
+import java.util.ArrayList;
+import java.util.HashMap;
+import java.util.List;
+import java.util.Map;
 
 public class GerenciadorJSON {
     private static final String ARQUIVO = "dados.json";

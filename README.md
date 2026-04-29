@@ -1,12 +1,12 @@
 # Sistema SUS - Farmácia Popular
 
-Sistema de gerenciamento de farmácias populares do SUS desenvolvido em Java com interface gráfica Swing.
+Sistema de gerenciamento de farmácias, produtos e usuarios do SUS desenvolvido em Java com interface gráfica Swing.
 
-## 📋 Descrição
-5
+## Descrição
+
 O Sistema SUS - Farmácia Popular é uma aplicação desktop que permite aos usuários consultar e adquirir medicamentos disponíveis nas Unidades Básicas de Saúde (UBS). O sistema oferece funcionalidades completas de gerenciamento para administradores e uma interface intuitiva para os clientes.
 
-## 🚀 Funcionalidades
+## Funcionalidades
 
 ### Para Usuários (Clientes)
 
@@ -62,69 +62,7 @@ O Sistema SUS - Farmácia Popular é uma aplicação desktop que permite aos usu
   - **Pendente**: Aguardando aprovação (medicamentos com receita)
   - **Aprovado**: Pedido aprovado e processado
 
-### Para Administradores
-
-#### 1. Gerenciamento de UBS
-- **Adicionar UBS**: Cadastro de novas unidades
-  - Nome
-  - Endereço completo (logradouro, número, bairro, estado, CEP)
-  - Imagem da unidade
-- **Atualizar UBS**: Edição de dados existentes
-- **Remover UBS**: Exclusão de unidades
-- **Listar UBS**: Visualização completa com todos os campos
-
-#### 2. Gerenciamento de Medicamentos
-- **Cadastrar Remédio**: Adição de novos medicamentos
-  - Nome
-  - Preço
-  - Estoque
-  - Necessidade de receita
-  - UBS vinculada
-  - Imagem
-  - Descrição
-  - Tipo
-  - Gramatura
-- **Atualizar Remédio**: Edição de dados existentes
-- **Deletar Remédio**: Remoção de medicamentos
-- **Listar Estoque**: Visualização de todos os medicamentos
-
-#### 3. Gerenciamento de Usuários
-- **Adicionar Fundos**: Crédito de saldo para usuários
-- **Desbloquear Usuários**: Resetar tentativas de login
-- **Listar Usuários Bloqueados**: Visualização de contas bloqueadas
-
-#### 4. Gerenciamento de Pedidos
-- **Revisar Pedidos**: Aprovação de pedidos com receita médica
-  - Visualização da receita enviada
-  - Aprovação ou rejeição
-- **Consultar Pedidos**: Visualização de todos os pedidos realizados
-  - Informações do usuário
-  - Lista de medicamentos
-  - Valor total
-  - Status
-
-## 🏗️ Arquitetura do Sistema
-
-### Estrutura de Classes
-
-#### Entidades
-- **Usuario**: Representa usuários do sistema (clientes e administradores)
-- **UBS**: Representa as Unidades Básicas de Saúde
-- **Remedio**: Representa os medicamentos disponíveis
-- **Pedido**: Representa os pedidos realizados
-- **Receita**: Representa as receitas médicas enviadas
-
-#### Gerenciamento
-- **SistemaFarmacia**: Singleton que gerencia toda a lógica de negócio
-- **GerenciadorJSON**: Responsável pela persistência de dados em JSON
-
-#### Interface Gráfica
-- **TelaInicial**: Tela de login e cadastro
-- **TelaSelecaoUBS**: Tela de seleção de UBS
-- **TelaCliente**: Tela de consulta de medicamentos e carrinho
-- **TelaAdmin**: Painel administrativo
-
-### Persistência de Dados
+### Sistema Gerenciador de dados
 
 O sistema utiliza um arquivo JSON (`dados.json`) para armazenar todas as informações:
 
@@ -168,37 +106,33 @@ O sistema utiliza um arquivo JSON (`dados.json`) para armazenar todas as informa
 }
 ```
 
-## 🎨 Interface do Usuário
-
-### Paleta de Cores
-- **Azul SUS**: RGB(0, 94, 184) - Cor principal do sistema
-- **Fundo**: RGB(232, 244, 248) - Azul claro para o fundo
-- **Branco**: RGB(255, 255, 255) - Containers e cards
-- **Verde**: RGB(0, 150, 0) - Preços e valores positivos
-
-### Componentes Visuais
-- **Cards com bordas arredondadas**: Para UBS, medicamentos e pedidos
-- **Campos de busca**: Com ícone de lupa
-- **Botões de ação**: Com cores diferenciadas por função
-- **Painéis de resumo**: Com informações detalhadas
-- **Scroll suave**: Para listas longas
-
 ## 📁 Estrutura de Diretórios
 
 ```
 sistema_saude/
 ├── src/
-│   ├── TelaInicial.java
-│   ├── TelaSelecaoUBS.java
-│   ├── TelaCliente.java
-│   ├── TelaAdmin.java
-│   ├── SistemaFarmacia.java
-│   ├── GerenciadorJSON.java
-│   ├── Usuario.java
-│   ├── UBS.java
-│   ├── Remedio.java
-│   ├── Pedido.java
-│   └── Receita.java
+│   ├── core/                    # Facade - Interface unificada
+│   │   └── SistemaFarmacia.java
+│   ├── services/                # Lógica de negócio
+│   │   ├── AutenticacaoService.java
+│   │   ├── UsuarioService.java
+│   │   ├── UBSService.java
+│   │   ├── RemedioService.java
+│   │   └── PedidoService.java
+│   ├── models/                  # Entidades
+│   │   ├── Usuario.java
+│   │   ├── UBS.java
+│   │   ├── Remedio.java
+│   │   ├── Pedido.java
+│   │   └── Receita.java
+│   ├── views/                   # Interface gráfica
+│   │   ├── TelaInicial.java
+│   │   ├── TelaSelecaoUBS.java
+│   │   ├── TelaCliente.java
+│   │   └── TelaAdmin.java
+│   ├── database/                # Persistência
+│   │   └── GerenciadorJSON.java
+│   └── Main.java                # Ponto de entrada
 ├── assets/
 │   ├── logo.png
 │   ├── tela_inicial.png
@@ -207,12 +141,13 @@ sistema_saude/
 │   ├── home.png
 │   ├── local.png
 │   ├── drug.png
-│   ├── drug_data/          # Imagens dos medicamentos
-│   ├── ubs_data/           # Imagens das UBS
+│   ├── drug_data/               # Imagens dos medicamentos
+│   ├── ubs_data/                # Imagens das UBS
 │   └── user_data/
-│       └── receitas/       # Receitas médicas enviadas
-├── dados.json              # Banco de dados em JSON
-└── README.md
+│       └── receitas/            # Receitas médicas enviadas
+├── dados.json                   # Banco de dados em JSON
+├── README.md
+└── REFATORACAO.md               # Documentação da refatoração
 ```
 
 ## 🔐 Segurança
@@ -229,123 +164,47 @@ sistema_saude/
 - **Usuários Comuns**: Acesso apenas às funcionalidades de cliente
 - **Administradores**: Acesso completo ao sistema
 
-## 🚦 Fluxo de Uso
-
-### Fluxo do Cliente
-
-1. **Login/Cadastro**
-   - Usuário faz login ou cria uma conta
-   - Sistema valida credenciais
-
-2. **Seleção de UBS**
-   - Usuário visualiza UBS disponíveis
-   - Pode buscar por nome ou endereço
-   - Seleciona a UBS desejada
-
-3. **Consulta de Medicamentos**
-   - Visualiza medicamentos disponíveis na UBS
-   - Pode buscar por nome
-   - Visualiza detalhes do medicamento
-
-4. **Adicionar ao Carrinho**
-   - Seleciona quantidade desejada
-   - Adiciona ao carrinho
-   - Pode adicionar múltiplos itens
-
-5. **Finalizar Pedido**
-   - Visualiza resumo do carrinho
-   - Se necessário, envia receita médica
-   - Sistema valida saldo e estoque
-   - Pedido é criado e processado
-
-### Fluxo do Administrador
-
-1. **Login**
-   - Acesso com credenciais de administrador
-   - Usuário padrão: `administrador` / Senha: `123`
-
-2. **Painel Administrativo**
-   - Acesso a todas as funcionalidades de gerenciamento
-
-3. **Gerenciamento**
-   - Adiciona/edita/remove UBS e medicamentos
-   - Adiciona fundos aos usuários
-   - Revisa e aprova pedidos
-   - Desbloqueia usuários
-
-## 💾 Dados Iniciais
-
-### Usuário Administrador Padrão
-- **CPF**: administrador
-- **Senha**: 123
-
-### UBS Cadastradas
-1. **UBS Jordanópolis**
-   - Viela Jangada Nova, 75 - Jardim Pres., SP
-   - CEP: 04830-200
-
-2. **UBS Vila Mariana**
-   - Rua das Flores, 123 - Vila Mariana, SP
-   - CEP: 04567-890
-
-3. **UBS Mooca**
-   - Av. Paes de Barros, 456 - Mooca, SP
-   - CEP: 03115-000
-
-### Medicamentos Cadastrados
-- Paracetamol (500mg)
-- Ibuprofeno (600mg)
-- Amoxicilina (500mg) - Requer receita
-- Dipirona (1g)
-- Losartana (50mg)
-- Omeprazol (20mg)
-- Metformina (850mg)
-- Atenolol (25mg)
-- Sinvastatina (20mg)
-- Captopril (25mg)
-- Azitromicina (500mg) - Requer receita
-- Dexametasona (4mg) - Requer receita
-
-## 🛠️ Tecnologias Utilizadas
-
-- **Java**: Linguagem de programação
-- **Swing**: Framework para interface gráfica
-- **JSON**: Formato de persistência de dados
-- **Padrão Singleton**: Para gerenciamento centralizado
-- **MVC**: Separação de responsabilidades
-
-## 📝 Requisitos do Sistema
-
-- Java JDK 8 ou superior
-- Sistema operacional: Windows, Linux ou macOS
-- Resolução mínima: 1200x700 pixels
-
 ## 🚀 Como Executar
 
-1. Compile todos os arquivos `.java` na pasta `src/`
-2. Execute a classe `TelaInicial`
-3. O sistema criará automaticamente o arquivo `dados.json` na primeira execução
-4. Use as credenciais do administrador para acesso completo ou crie uma conta de usuário
+### Compilação
 
-## 📌 Observações
+```bash
+# Navegar até o diretório do projeto
+cd sistema_saude
 
-- As imagens dos medicamentos e UBS devem estar nas pastas correspondentes em `assets/`
-- O sistema cria automaticamente as pastas necessárias para armazenar receitas
-- Todos os dados são persistidos em tempo real no arquivo JSON
-- O sistema suporta múltiplos usuários simultâneos (em execuções separadas)
+# Compilar todos os arquivos (Windows)
+javac -d bin -sourcepath src src\Main.java
 
-## 🔄 Atualizações Futuras
+# Compilar todos os arquivos (Linux/Mac)
+javac -d bin -sourcepath src src/Main.java
+```
 
-- Integração com gov.br
-- Relatórios de vendas
-- Histórico de pedidos do usuário
-- Notificações de estoque baixo
-- Sistema de avaliação de medicamentos
-- Agendamento de retirada
+### Execução
 
-## 👥 Autores
+```bash
+# Executar o sistema (Windows)
+java -cp bin Main
 
-Projeto desenvolvido como atividade de Programação Orientada a Objetos (POO).
+# Executar o sistema (Linux/Mac)
+java -cp bin Main
+```
+
+### Primeira Execução
+
+1. O sistema criará automaticamente o arquivo `dados.json` na primeira execução
+2. Use as credenciais do administrador para acesso completo:
+   - **CPF**: `administrador`
+   - **Senha**: `123`
+3. Ou crie uma conta de usuário comum para testar as funcionalidades de cliente
+
+### Estrutura de Pacotes
+
+O sistema utiliza a seguinte estrutura de pacotes:
+- `core` - Facade do sistema
+- `services` - Lógica de negócio
+- `models` - Entidades
+- `views` - Interface gráfica
+- `database` - Persistência
 
 ## 📄 Licença
 

@@ -1,7 +1,17 @@
+//src/views/TelaAdmin.java
+
+package views;
+
+import core.SistemaFarmacia;
+import models.Pedido;
+import models.Remedio;
+import models.UBS;
+import models.Usuario;
+
+import javax.imageio.ImageIO;
 import javax.swing.*;
 import java.awt.*;
 import java.io.File;
-import javax.imageio.ImageIO;
 
 public class TelaAdmin extends JFrame {
     private static final Color COR_AZUL_SUS = new Color(0, 94, 184);
@@ -60,6 +70,13 @@ public class TelaAdmin extends JFrame {
             }
         } catch (Exception e) {
             System.err.println("Erro ao carregar logo: " + e.getMessage());
+        }
+        
+        try {
+            Image icon = ImageIO.read(new File("assets/icon.png"));
+            setIconImage(icon);
+        } catch (Exception e) {
+            System.err.println("Erro ao carregar ícone: " + e.getMessage());
         }
 
         JPanel rightPanel = new JPanel(new FlowLayout(FlowLayout.RIGHT, 20, 0));

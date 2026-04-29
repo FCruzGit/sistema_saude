@@ -1,3 +1,7 @@
+//src/models/Usuario.java
+
+package models;
+
 public class Usuario {
     private String cpf;
     private String nome;

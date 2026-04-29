@@ -1,3 +1,7 @@
+//src/models/Receita.java
+
+package models;
+
 public class Receita {
     private int id;
     private String nomeCliente;
