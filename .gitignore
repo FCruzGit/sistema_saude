@@ -1,3 +1,13 @@
+# pastas assets
+\drug_data
+\ubs_data
+\user_data
+\receitas
+\lib
+\out
+\.idea
+\dados.json
+
 # Compiled class file
 *.class
 
