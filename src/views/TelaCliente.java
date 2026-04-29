@@ -1,13 +1,22 @@
+//src/views/TelaCliente.java
+
+package views;
+
+import core.SistemaFarmacia;
+import models.Pedido;
+import models.Remedio;
+import models.Usuario;
+
+import javax.imageio.ImageIO;
 import javax.swing.*;
 import java.awt.*;
-import java.util.ArrayList;
-import java.util.HashMap;
-import java.util.Map;
 import java.io.File;
 import java.io.IOException;
 import java.nio.file.Files;
 import java.nio.file.StandardCopyOption;
-import javax.imageio.ImageIO;
+import java.util.ArrayList;
+import java.util.HashMap;
+import java.util.Map;
 
 public class TelaCliente extends JFrame {
     private static final Color COR_AZUL_SUS = new Color(0, 94, 184);

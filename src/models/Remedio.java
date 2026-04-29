@@ -1,3 +1,7 @@
+//src/models/Remedio.java
+
+package models;
+
 public class Remedio {
     private int id;
     private String nome;
